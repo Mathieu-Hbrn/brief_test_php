@@ -38,12 +38,14 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product) {
         $request->validate([
-            'name' => 'required',
-            'price' => 'required|numeric',
-            'stock' => 'required|integer',
+            'name' => 'required|string|min:3|max:255',
+            'description' => 'required|string|max:2000',
+            'price' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
+            'stock' => 'required|integer|min:0',
         ]);
 
-        $product->update($request->all());
+        $product->fill($request->only(['name', 'description', 'price', 'stock']))->save();
+
         return redirect()->route('products.index')->with('success', 'Produit mis à jour avec succès !');
     }
 
