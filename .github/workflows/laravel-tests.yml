@@ -1,5 +1,9 @@
 name: PHP Composer
 
+defaults:
+  run:
+    working-directory: ./brief_test
+
 on:
   push:
     branches: [ "master" ]
