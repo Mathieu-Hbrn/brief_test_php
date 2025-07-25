@@ -20,6 +20,12 @@ jobs:
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
 
+      - name: Initialize PHP ${{ env.php_version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.php_version }}
+          coverage: pcov
+
       - name: Cache Composer packages
         id: composer-cache
         uses: actions/cache@v3
