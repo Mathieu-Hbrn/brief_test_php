@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\TestCase;
+use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use App\Models\Product;
 
@@ -75,7 +75,7 @@ class ProductFonctTest extends TestCase
 
     }
 
-    public function test_delete_product()
+    public function testDestroyProduct(): void
     {
         $data = [
             'name' => 'New Product Test',
@@ -84,25 +84,16 @@ class ProductFonctTest extends TestCase
             'stock' => 10,
         ];
 
-
-        // Crée un produit initial
         $product = Product::create($data);
-        $id = $product->id;
-        $response= $this->get('/products');
-        $response->assertStatus(200);
-        $response->assertSee('New Product Test');
 
-        // Fait la requête de delete
-        $product->delete($id);
-        $response= $this->get('/products');
-        $response->assertStatus(200);
-        $response->assertDontSee('New Product Test');
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
 
-        // Vérifie que la BDD contient la version mise à jour
-        $this->assertDatabaseMissing('products', [
-            'id' => $product->id,
-        ]);
+        $response = $this->delete(route('products.destroy', $product));
 
+        $response->assertStatus(302);
+        $response->assertRedirect(route('products.index'));
+        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+        $response->assertSessionHas('success', 'Produit supprimé avec succès !');
     }
 
 }
